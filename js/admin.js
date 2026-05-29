@@ -83,6 +83,26 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  /* ---------------- 시트 전체화면 ---------------- */
+  var fsBtn = document.getElementById("fullscreenBtn");
+  var dataPanel = document.getElementById("tab-data");
+  function exitFullscreen() {
+    dataPanel.classList.remove("fullscreen");
+    fsBtn.textContent = "🔳 시트 전체화면";
+    document.body.style.overflow = "";
+  }
+  if (fsBtn && dataPanel) {
+    fsBtn.addEventListener("click", function () {
+      var on = dataPanel.classList.toggle("fullscreen");
+      fsBtn.textContent = on ? "✕ 전체화면 닫기" : "🔳 시트 전체화면";
+      document.body.style.overflow = on ? "hidden" : "";
+    });
+    // 키보드 Esc 로도 전체화면 닫기
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && dataPanel.classList.contains("fullscreen")) exitFullscreen();
+    });
+  }
+
   /* ---------------- 설정값 불러오기 ---------------- */
   function loadSettings() {
     Api.jsonp("getSettings")
