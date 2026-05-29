@@ -43,7 +43,7 @@
       <div class="admin-tabs">
         <div class="admin-tab active" data-tab="data">📋 신청 데이터</div>
         <div class="admin-tab" data-tab="intro">🖼️ 소개서 이미지</div>
-        <div class="admin-tab" data-tab="link">🔗 구매 링크</div>
+        <div class="admin-tab" data-tab="link">🔗 링크·알림</div>
         <div class="admin-tab" data-tab="pw">🔒 비밀번호</div>
       </div>
 
@@ -77,13 +77,19 @@
         <div id="introList" style="margin-top:10px"></div>
       </div>
 
-      <!-- (탭3) 구매 링크 -->
+      <!-- (탭3) 링크 · 알림 -->
       <div id="tab-link" class="tab-panel card hidden">
-        <h2>구매 홈페이지 링크</h2>
-        <p class="card-desc">[입면환 홈페이지 보기] 버튼을 누르면 이동할 주소입니다.</p>
+        <h2>링크 · 알림 설정</h2>
+        <p class="card-desc">구매 페이지 주소와, 신청 알림을 받을 메일을 설정합니다.</p>
         <div class="field">
           <label>구매 페이지 주소</label>
           <input type="text" id="homepageUrl" placeholder="https://..." />
+          <div class="hint">[입면환 홈페이지 보기] 버튼을 누르면 이동할 주소입니다.</div>
+        </div>
+        <div class="field">
+          <label>알림 받을 메일</label>
+          <input type="text" id="notifyEmail" placeholder="예) repotion7@naver.com, repotion7@gmail.com" />
+          <div class="hint">새 신청이 들어오면 이 메일로 알림이 갑니다. 여러 개를 받으려면 쉼표(,)로 구분하세요. (네이버+지메일 동시 추천)</div>
         </div>
         <button type="button" class="btn" id="saveLinkBtn">
           <span id="saveLinkText">저장하기</span>

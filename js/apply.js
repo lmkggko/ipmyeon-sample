@@ -158,7 +158,6 @@ document.addEventListener("DOMContentLoaded", function () {
       "약국 상호 명": val("f_pharmacy"),
       "사업자 번호": val("f_biz"),
       "사업장 소재지": joinAddr(val("f_bizaddr"), val("f_bizaddr_detail")),
-      "약사 면허번호": val("f_license"),
       "대표자 성함": val("f_owner"),
       "신청인": val("f_applicant"),
       "연락처": val("f_phone"),
@@ -177,7 +176,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var biz = p["사업자 번호"].replace(/[^0-9]/g, "");
     if (biz.length !== 10) return "사업자 번호를 정확히 입력해주세요. (숫자 10자리)";
     if (!document.getElementById("f_bizaddr").value.trim()) return "사업장 소재지를 주소 검색으로 입력해주세요.";
-    if (!p["약사 면허번호"]) return "약사 면허번호를 입력해주세요.";
     if (!p["대표자 성함"]) return "대표자 성함을 입력해주세요.";
     if (!p["신청인"]) return "신청인을 입력해주세요.";
     var phone = p["연락처"].replace(/[^0-9]/g, "");
@@ -190,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function setLoading(on) {
     submitBtn.disabled = on;
-    submitText.textContent = on ? "신청 중..." : "샘플 신청하기";
+    submitText.textContent = on ? "신청 중..." : "본품 1BOX 샘플 신청하기";
     submitSpin.classList.toggle("hidden", !on);
   }
   function showMsg(text) {
@@ -206,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var done = document.getElementById("doneScreen");
     if (isDuplicate) {
       document.getElementById("doneMsg").innerHTML =
-        "소중한 신청 감사합니다.<br />이미 같은 사업자번호로 신청 내역이 있어 함께 확인 후 보내드리겠습니다. 🌙";
+        "소중한 신청 감사합니다.<br />이미 같은 사업자번호로 신청 내역이 있어 함께 확인 후 입면환 본품 1BOX 샘플을 보내드리겠습니다. 🌙";
     }
     done.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });

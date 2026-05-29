@@ -43,6 +43,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (res && res.ok) {
           auth = { id: id, pw: pw };
           try { sessionStorage.setItem("admin_auth", JSON.stringify(auth)); } catch (e) {}
+          // 로그인 응답에 담겨온 현재 설정값 미리 채우기
+          if (res.homepageUrl) document.getElementById("homepageUrl").value = res.homepageUrl;
+          if (res.notifyEmail) document.getElementById("notifyEmail").value = res.notifyEmail;
           showDashboard();
         } else {
           showInline(msg, "msg-error", "아이디 또는 비밀번호가 올바르지 않습니다.");
@@ -178,12 +181,14 @@ document.addEventListener("DOMContentLoaded", function () {
   /* ---------------- 구매 링크 저장 ---------------- */
   document.getElementById("saveLinkBtn").addEventListener("click", function () {
     var url = document.getElementById("homepageUrl").value.trim();
+    var email = document.getElementById("notifyEmail").value.trim();
     var msg = document.getElementById("linkMsg");
     msg.classList.add("hidden");
-    if (!/^https?:\/\//.test(url)) { showInline(msg, "msg-error", "주소는 http:// 또는 https:// 로 시작해야 합니다."); return; }
+    if (!/^https?:\/\//.test(url)) { showInline(msg, "msg-error", "구매 페이지 주소는 http:// 또는 https:// 로 시작해야 합니다."); return; }
+    if (!email || email.indexOf("@") === -1) { showInline(msg, "msg-error", "알림 받을 메일 주소를 정확히 입력해주세요."); return; }
 
     toggleSpin("saveLink", true);
-    Api.jsonp("saveSettings", { id: auth.id, pw: auth.pw, homepageUrl: url })
+    Api.jsonp("saveSettings", { id: auth.id, pw: auth.pw, homepageUrl: url, notifyEmail: email })
       .then(function (res) {
         toggleSpin("saveLink", false);
         if (res && res.ok) showInline(msg, "msg-success", "저장되었습니다. ✅");
