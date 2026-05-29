@@ -103,12 +103,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  /* ---------------- 설정값 불러오기 ---------------- */
+  /* ---------------- 설정값 불러오기 ----------------
+   * 관리자 인증 호출(adminLogin)로 현재 저장된 '구매 링크 + 알림 메일'을
+   * 항상 불러와 칸에 채운다. (새로고침/재접속 시에도 빈칸이 되지 않도록)
+   */
   function loadSettings() {
-    Api.jsonp("getSettings")
+    Api.jsonp("adminLogin", { id: auth.id, pw: auth.pw })
       .then(function (res) {
-        if (res) {
+        if (res && res.ok) {
           if (res.homepageUrl) document.getElementById("homepageUrl").value = res.homepageUrl;
+          if (res.notifyEmail) document.getElementById("notifyEmail").value = res.notifyEmail;
         }
       })
       .catch(function () {});
