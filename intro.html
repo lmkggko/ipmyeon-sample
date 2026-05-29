@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>입면환 소개서 — 현대보감</title>
+  <meta name="description" content="현대보감 입면환 제품 소개서입니다." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="brand">현대보감</div>
+    <h1>입면환 소개서</h1>
+    <div class="desc">제품을 자세히 소개해 드립니다 🌙</div>
+  </header>
+
+  <nav class="top-buttons">
+    <a class="top-btn" href="index.html">
+      <span class="ic">📝</span> 샘플 신청하기
+    </a>
+    <a class="top-btn" id="btnHomepage" href="#" target="_blank" rel="noopener">
+      <span class="ic">🛒</span> 홈페이지 보기
+    </a>
+  </nav>
+
+  <div class="wrap">
+    <!-- 로딩 표시 -->
+    <div id="introLoading" class="empty-state">
+      <div class="big">⏳</div>
+      소개서를 불러오는 중입니다...
+    </div>
+
+    <!-- 소개서 이미지가 표시될 영역 -->
+    <div id="introImages" class="intro-images card hidden" style="padding:14px"></div>
+
+    <!-- 소개서가 아직 없을 때 -->
+    <div id="introEmpty" class="empty-state hidden">
+      <div class="big">📭</div>
+      아직 등록된 소개서가 없습니다.<br />곧 준비될 예정입니다.
+    </div>
+
+    <a href="index.html" class="btn" style="margin-top:20px;text-decoration:none">📝 샘플 신청하러 가기</a>
+
+    <div class="foot">© 현대보감 입면환</div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/intro.js"></script>
+</body>
+</html>

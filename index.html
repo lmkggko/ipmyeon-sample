@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>현대보감 입면환 — 약사 전용 샘플 신청</title>
+  <meta name="description" content="약사님을 위한 현대보감 입면환 무료 샘플 신청 페이지입니다." />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- 다음(카카오) 우편번호 검색 서비스 (무료) -->
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body>
+
+  <!-- ===== 상단 헤더 ===== -->
+  <header class="site-header">
+    <div class="brand" id="brandSub">약사 전용 샘플 신청</div>
+    <h1 id="brandName">현대보감 입면환</h1>
+    <div class="desc">아래 정보를 입력하시면 샘플을 보내드립니다 🌙</div>
+  </header>
+
+  <!-- ===== 상단 버튼 2개 ===== -->
+  <nav class="top-buttons">
+    <a class="top-btn" href="intro.html">
+      <span class="ic">📖</span> 입면환 소개서 보기
+    </a>
+    <a class="top-btn" id="btnHomepage" href="#" target="_blank" rel="noopener">
+      <span class="ic">🛒</span> 입면환 홈페이지 보기
+    </a>
+  </nav>
+
+  <div class="wrap">
+
+    <!-- ===== 신청 폼 ===== -->
+    <form id="applyForm" class="card" novalidate>
+      <h2>샘플 신청서</h2>
+      <p class="card-desc">표시(<span style="color:#dc2626">*</span>)된 항목은 꼭 입력해주세요.</p>
+
+      <!-- 약국 상호명 -->
+      <div class="field full">
+        <label>약국 상호명 <span class="req">*</span></label>
+        <input type="text" id="f_pharmacy" placeholder="예) 행복약국" autocomplete="organization" />
+      </div>
+
+      <!-- 사업자번호 -->
+      <div class="field">
+        <label>사업자 번호 <span class="req">*</span></label>
+        <input type="text" id="f_biz" inputmode="numeric" placeholder="예) 123-45-67890" maxlength="12" />
+        <div class="hint">숫자 10자리를 입력하면 자동으로 - 가 붙습니다.</div>
+      </div>
+
+      <!-- 약사 면허번호 -->
+      <div class="field">
+        <label>약사 면허번호 <span class="req">*</span></label>
+        <input type="text" id="f_license" inputmode="numeric" placeholder="예) 12345" />
+      </div>
+
+      <!-- 사업장 소재지 -->
+      <div class="field full">
+        <label>사업장 소재지 <span class="req">*</span></label>
+        <div class="addr-row">
+          <input type="text" id="f_bizaddr" placeholder="주소 검색 버튼을 눌러주세요" readonly />
+          <button type="button" class="btn-search" id="btnBizAddr">주소 검색</button>
+        </div>
+        <input type="text" id="f_bizaddr_detail" placeholder="상세주소 (건물명, 층, 호 등)" style="margin-top:8px" />
+      </div>
+
+      <!-- 대표자 성함 -->
+      <div class="field">
+        <label>대표자 성함 <span class="req">*</span></label>
+        <input type="text" id="f_owner" placeholder="예) 홍길동" autocomplete="name" />
+      </div>
+
+      <!-- 신청인 -->
+      <div class="field">
+        <label>신청인 <span class="req">*</span></label>
+        <input type="text" id="f_applicant" placeholder="예) 홍길동" />
+        <label class="inline-check">
+          <input type="checkbox" id="sameAsOwner" /> 대표자와 동일
+        </label>
+      </div>
+
+      <!-- 연락처 -->
+      <div class="field">
+        <label>연락처 <span class="req">*</span></label>
+        <input type="tel" id="f_phone" inputmode="numeric" placeholder="예) 010-1234-5678" maxlength="13" />
+      </div>
+
+      <!-- 이메일 -->
+      <div class="field">
+        <label>이메일 <span class="req">*</span></label>
+        <input type="email" id="f_email" inputmode="email" placeholder="예) pharmacy@email.com" autocomplete="email" />
+        <div class="hint">샘플 발송(배송) 안내 메일이 이 주소로 갑니다.</div>
+      </div>
+
+      <!-- 샘플 받을 주소 -->
+      <div class="field full">
+        <label>샘플 받을 주소 <span class="req">*</span></label>
+        <label class="inline-check" style="margin-top:0;margin-bottom:8px">
+          <input type="checkbox" id="sameAsBizAddr" /> 사업장 소재지와 동일
+        </label>
+        <div class="addr-row">
+          <input type="text" id="f_zip" placeholder="우편번호" readonly style="max-width:130px" />
+          <button type="button" class="btn-search" id="btnSampleAddr">주소 검색</button>
+        </div>
+        <input type="text" id="f_addr" placeholder="기본 주소" readonly style="margin-top:8px" />
+        <input type="text" id="f_addr_detail" placeholder="상세주소 (건물명, 층, 호 등)" style="margin-top:8px" />
+      </div>
+
+      <!-- 개인정보 동의 -->
+      <div class="field full">
+        <div class="agree-box">
+          <div class="agree-text">
+            <strong>[개인정보 수집·이용 동의]</strong><br />
+            현대보감은 입면환 샘플 발송 및 관련 안내를 위해 아래와 같이 개인정보를 수집·이용합니다.<br /><br />
+            • 수집 항목: 약국 상호명, 사업자번호, 사업장 소재지, 약사 면허번호, 대표자 성함, 신청인, 연락처, 이메일, 배송지 주소<br />
+            • 이용 목적: 샘플 발송, 배송 안내, 제품 상담 및 영업 연락<br />
+            • 보유 기간: 수집일로부터 3년(또는 동의 철회 시까지)<br />
+            • 동의를 거부할 권리가 있으나, 거부 시 샘플 신청이 제한됩니다.
+          </div>
+          <label class="agree-check">
+            <input type="checkbox" id="f_agree" /> 위 개인정보 수집·이용에 동의합니다. <span class="req">*</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 오류 메시지 영역 -->
+      <div id="formMsg" class="msg msg-error hidden"></div>
+
+      <!-- 제출 버튼 -->
+      <button type="submit" class="btn" id="submitBtn" style="margin-top:6px">
+        <span id="submitText">샘플 신청하기</span>
+        <span id="submitSpin" class="spinner hidden"></span>
+      </button>
+    </form>
+
+    <!-- ===== 신청 완료 화면 (처음엔 숨김) ===== -->
+    <div id="doneScreen" class="card done hidden">
+      <div class="check">✓</div>
+      <h2>신청이 완료되었습니다!</h2>
+      <p id="doneMsg">소중한 신청 감사합니다.<br />샘플을 빠르게 준비해서 보내드리겠습니다. 🌙</p>
+      <button type="button" class="btn btn-line btn-sm" id="againBtn" style="margin-top:20px">새로 신청하기</button>
+    </div>
+
+    <div class="foot">© 현대보감 입면환 · 약사 전용 샘플 신청</div>
+  </div>
+
+  <!-- 스크립트 (순서 중요: config → api → apply) -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/apply.js"></script>
+</body>
+</html>

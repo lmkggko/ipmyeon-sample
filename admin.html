@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 페이지 — 현대보감 입면환</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="brand">현대보감 입면환</div>
+    <h1>관리자 페이지</h1>
+    <div class="desc">신청 데이터 · 소개서 · 링크를 관리합니다</div>
+  </header>
+
+  <div class="wrap wide">
+
+    <!-- ===== 1) 로그인 화면 ===== -->
+    <div id="loginBox" class="card">
+      <h2>관리자 로그인</h2>
+      <p class="card-desc">관리자 아이디와 비밀번호를 입력해주세요.</p>
+      <div class="field">
+        <label>아이디</label>
+        <input type="text" id="loginId" placeholder="아이디" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label>비밀번호</label>
+        <input type="password" id="loginPw" placeholder="비밀번호" autocomplete="current-password" />
+      </div>
+      <div id="loginMsg" class="msg msg-error hidden"></div>
+      <button type="button" class="btn" id="loginBtn">
+        <span id="loginText">로그인</span>
+        <span id="loginSpin" class="spinner hidden"></span>
+      </button>
+    </div>
+
+    <!-- ===== 2) 관리자 대시보드 (로그인 후) ===== -->
+    <div id="dashboard" class="hidden">
+
+      <!-- 탭 -->
+      <div class="admin-tabs">
+        <div class="admin-tab active" data-tab="data">📋 신청 데이터</div>
+        <div class="admin-tab" data-tab="intro">🖼️ 소개서 이미지</div>
+        <div class="admin-tab" data-tab="link">🔗 구매 링크</div>
+        <div class="admin-tab" data-tab="pw">🔒 비밀번호</div>
+      </div>
+
+      <!-- (탭1) 신청 데이터: 구글 시트 임베드 -->
+      <div id="tab-data" class="tab-panel card">
+        <h2>신청 데이터 관리</h2>
+        <p class="card-desc">아래에서 신청 내역을 직접 보고 수정할 수 있습니다. (송장번호 입력, 배송상태·계약 변경, 행 삭제 등)</p>
+        <a id="openSheetBtn" class="btn btn-line btn-sm" target="_blank" rel="noopener" style="margin-bottom:10px;text-decoration:none">↗ 새 창에서 시트 크게 열기</a>
+        <iframe id="sheetFrame" class="sheet-frame" title="신청 데이터 시트"></iframe>
+        <div class="msg msg-info" style="margin-top:12px">
+          💡 시트가 "권한 필요"로 보이면, 이 브라우저에서 시트 주인 구글 계정으로 로그인되어 있는지 확인하세요.
+        </div>
+      </div>
+
+      <!-- (탭2) 소개서 이미지 -->
+      <div id="tab-intro" class="tab-panel card hidden">
+        <h2>소개서 이미지 관리</h2>
+        <p class="card-desc">소개서로 보여줄 이미지를 올리거나 지울 수 있습니다. (여러 장 가능 · 위에서부터 순서대로 표시)</p>
+        <div class="field">
+          <label>이미지 올리기</label>
+          <input type="file" id="introFile" accept="image/*" />
+          <div class="hint">JPG, PNG 등 이미지 파일. 한 번에 한 장씩 올라갑니다.</div>
+        </div>
+        <button type="button" class="btn" id="uploadBtn">
+          <span id="uploadText">이 이미지 올리기</span>
+          <span id="uploadSpin" class="spinner hidden"></span>
+        </button>
+        <div id="uploadMsg" class="msg hidden" style="margin-top:12px"></div>
+
+        <h2 style="margin-top:26px;font-size:15px">현재 등록된 소개서</h2>
+        <div id="introList" style="margin-top:10px"></div>
+      </div>
+
+      <!-- (탭3) 구매 링크 -->
+      <div id="tab-link" class="tab-panel card hidden">
+        <h2>구매 홈페이지 링크</h2>
+        <p class="card-desc">[입면환 홈페이지 보기] 버튼을 누르면 이동할 주소입니다.</p>
+        <div class="field">
+          <label>구매 페이지 주소</label>
+          <input type="text" id="homepageUrl" placeholder="https://..." />
+        </div>
+        <button type="button" class="btn" id="saveLinkBtn">
+          <span id="saveLinkText">저장하기</span>
+          <span id="saveLinkSpin" class="spinner hidden"></span>
+        </button>
+        <div id="linkMsg" class="msg hidden" style="margin-top:12px"></div>
+      </div>
+
+      <!-- (탭4) 비밀번호 변경 -->
+      <div id="tab-pw" class="tab-panel card hidden">
+        <h2>관리자 정보 변경</h2>
+        <p class="card-desc">아이디 또는 비밀번호를 바꿉니다. (바꾸지 않을 항목은 비워두세요)</p>
+        <div class="field">
+          <label>새 아이디 (선택)</label>
+          <input type="text" id="newId" placeholder="비워두면 기존 아이디 유지" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>새 비밀번호 (선택)</label>
+          <input type="password" id="newPw" placeholder="비워두면 기존 비밀번호 유지" autocomplete="new-password" />
+        </div>
+        <button type="button" class="btn" id="savePwBtn">
+          <span id="savePwText">변경하기</span>
+          <span id="savePwSpin" class="spinner hidden"></span>
+        </button>
+        <div id="pwMsg" class="msg hidden" style="margin-top:12px"></div>
+      </div>
+
+      <button type="button" class="btn btn-line btn-sm" id="logoutBtn" style="margin-top:18px">로그아웃</button>
+    </div>
+
+    <div class="foot">© 현대보감 입면환 · 관리자</div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
