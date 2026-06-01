@@ -17,7 +17,7 @@ const CONFIG = {
    * 그 주소를 복사해서, 아래 따옴표 안에 붙여넣으세요.
    * (자세한 방법은 'apps-script/01_구글시트_자동화_설치안내.md' 참고)
    * --------------------------------------------------------------------- */
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwQHPm3rSVjwTynkpXIqE4PgDTPf-RG3_7LsXj5N96f55w5E-9H3wziQG3DAYjHLmt8/exec",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwZhCWxUgyPGYG1yjzkMRHbLBq1YzJe6CO1b-qCDuV8nrekc5xL1JBdpkJXT8MjdvHUXg/exec",
 
   /* -----------------------------------------------------------------------
    * 구매 홈페이지 기본 주소
@@ -30,7 +30,7 @@ const CONFIG = {
    * 관리자 페이지에서 신청 데이터를 보여줄 구글 시트 ID
    * (구글 시트 주소 중 /d/ 와 /edit 사이의 긴 글자입니다)
    * --------------------------------------------------------------------- */
-  SHEET_ID: "1mnHLrGy13tvouNk8mbQa6u5BEIw97sWOT2rN7MzZnIk",
+  SHEET_ID: "1ee8HbbRBLMIfn1l3thv8NCYSqrG-zpmBJIYKd--OFQc",
 
   /* -----------------------------------------------------------------------
    * 브랜드(상단에 표시되는 이름) — 원하면 자유롭게 바꾸세요.

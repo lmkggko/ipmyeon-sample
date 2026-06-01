@@ -42,6 +42,7 @@
       <!-- 탭 -->
       <div class="admin-tabs">
         <div class="admin-tab active" data-tab="data">📋 신청 데이터</div>
+        <div class="admin-tab" data-tab="mail">📨 입점 권유 메일</div>
         <div class="admin-tab" data-tab="intro">🖼️ 소개서 이미지</div>
         <div class="admin-tab" data-tab="link">🔗 링크·알림</div>
         <div class="admin-tab" data-tab="pw">🔒 비밀번호</div>
@@ -57,6 +58,197 @@
         <div class="msg msg-info" style="margin-top:12px">
           💡 시트가 "권한 필요"로 보이면, 이 브라우저에서 시트 주인 구글 계정으로 로그인되어 있는지 확인하세요.
         </div>
+      </div>
+
+      <!-- (탭) 입점 권유 메일 -->
+      <div id="tab-mail" class="tab-panel hidden">
+
+        <!-- ① 보낼 메일 내용 -->
+        <div class="card mail-narrow">
+          <h2>① 보낼 메일 내용</h2>
+          <p class="card-desc">약국에 보낼 제목과 본문을 작성합니다. 본문에 <b>[약국명]</b>, <b>[약사명]</b>을 넣으면 발송할 때 각 약국 이름으로 자동으로 바뀝니다.</p>
+          <div class="field">
+            <label>메일 제목 (A안)</label>
+            <input type="text" id="mailSubject" placeholder="예) 약국 전용 입면환 입점 제안" />
+            <div class="hint">제목 앞에는 법에 따라 <b>(광고)</b>가 자동으로 붙습니다.</div>
+          </div>
+          <div class="field">
+            <label>B안 제목 (A/B 테스트용)</label>
+            <input type="text" id="mailSubjectB" placeholder="예) 수면 고객을 위한 입면환, 약국에 들여보세요" />
+            <div class="hint">'A/B 테스트로 보내기'를 켜면, 명단 절반은 A안 제목, 나머지 절반은 B안 제목으로 보냅니다.</div>
+          </div>
+          <div class="field">
+            <label>메일 본문</label>
+            <textarea id="mailBody" rows="9" placeholder="안녕하세요. ..."></textarea>
+          </div>
+          <div class="field">
+            <label>보내는 사람 이름</label>
+            <input type="text" id="mailSenderName" placeholder="예) 현대보감" />
+            <div class="hint">받는 약사에게 보이는 '보낸 사람' 이름입니다. (이메일 주소 자체는 시트를 소유한 구글 계정으로 나갑니다.)</div>
+          </div>
+          <div class="field">
+            <label>보내는 사람 정보 (선택 — 비워도 발송됩니다)</label>
+            <textarea id="mailSenderInfo" rows="3" placeholder="예) 현대보감 / 담당자 OOO / 010-0000-0000 / 서울시 ..."></textarea>
+            <div class="hint">메일 맨 아래에 표시됩니다. 광고 메일은 보내는 사람 정보를 넣는 것이 원칙이라 채워두길 권합니다.</div>
+          </div>
+          <button type="button" class="btn" id="saveMailBtn">
+            <span id="saveMailText">메일 내용 저장</span>
+            <span id="saveMailSpin" class="spinner hidden"></span>
+          </button>
+          <div id="mailMsg" class="msg hidden" style="margin-top:12px;white-space:pre-line"></div>
+        </div>
+
+        <!-- ② 약국 명단 추가 -->
+        <div class="card mail-narrow">
+          <h2>② 약국 명단 추가</h2>
+          <p class="card-desc">엑셀 양식에 채운 뒤 <b>복사·붙여넣기</b> 하거나 <b>CSV 파일</b>로 한꺼번에 올립니다. 칸 순서는 <b>약국명 · 약사/대표자명 · 이메일 · 연락처 · 주소 · 메모</b> 입니다. (빈칸은 비워두면 됩니다.)</p>
+          <button type="button" class="btn btn-line btn-sm" id="downloadTemplateBtn" style="margin-bottom:18px">⬇ 엑셀 양식 내려받기</button>
+
+          <div class="field">
+            <label>방법 A · 엑셀에서 복사해서 붙여넣기</label>
+            <textarea id="pasteBox" rows="6" placeholder="엑셀에서 약국명~메모 칸을 드래그로 복사한 뒤, 여기에 붙여넣기(Ctrl+V) 하세요."></textarea>
+            <div class="hint">맨 윗줄이 '약국명' 같은 제목 줄이면 자동으로 건너뜁니다.</div>
+          </div>
+          <button type="button" class="btn" id="pasteAddBtn">
+            <span id="pasteAddText">붙여넣은 명단 추가</span>
+            <span id="pasteAddSpin" class="spinner hidden"></span>
+          </button>
+
+          <div class="field" style="margin-top:20px">
+            <label>방법 B · CSV 파일 올리기</label>
+            <input type="file" id="csvFile" accept=".csv,text/csv" />
+            <div class="hint">엑셀에서 '다른 이름으로 저장 → CSV'로 만든 파일. 한글이 깨져도 자동 복구를 시도합니다.</div>
+          </div>
+          <button type="button" class="btn" id="csvAddBtn">
+            <span id="csvAddText">CSV 파일 추가</span>
+            <span id="csvAddSpin" class="spinner hidden"></span>
+          </button>
+          <div id="addMsg" class="msg hidden" style="margin-top:12px;white-space:pre-line"></div>
+        </div>
+
+        <!-- ②-2 전국 약국 자동 수집 (전화·우편용) -->
+        <div class="card mail-narrow">
+          <h2>②-2 · 전국 약국 자동 수집 (전화·우편용)</h2>
+          <p class="card-desc">공공데이터로 전국 약국(<b>약국명·주소·전화</b>)을 자동으로 DB에 추가합니다. ⚠️ <b>이메일은 제공되지 않아</b> 메일 발송엔 쓸 수 없고, 전화·우편·방문 영업용입니다. (처음 한 번 공공데이터 인증키 발급이 필요 — 사용설명서 참고)</p>
+          <div class="field">
+            <label>공공데이터 인증키</label>
+            <input type="text" id="pharmApiKey" placeholder="공공데이터포털에서 발급받은 '일반 인증키(Encoding)'" />
+            <div class="hint">한 번 입력하면 저장되어 계속 사용됩니다.</div>
+          </div>
+          <div class="field">
+            <label>시 / 도</label>
+            <select id="pharmSido">
+              <option value="">선택하세요</option>
+              <option value="서울특별시">서울특별시</option>
+              <option value="부산광역시">부산광역시</option>
+              <option value="대구광역시">대구광역시</option>
+              <option value="인천광역시">인천광역시</option>
+              <option value="광주광역시">광주광역시</option>
+              <option value="대전광역시">대전광역시</option>
+              <option value="울산광역시">울산광역시</option>
+              <option value="세종특별자치시">세종특별자치시</option>
+              <option value="경기도">경기도</option>
+              <option value="강원도">강원도</option>
+              <option value="충청북도">충청북도</option>
+              <option value="충청남도">충청남도</option>
+              <option value="전라북도">전라북도</option>
+              <option value="전라남도">전라남도</option>
+              <option value="경상북도">경상북도</option>
+              <option value="경상남도">경상남도</option>
+              <option value="제주특별자치도">제주특별자치도</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>시 / 군 / 구 (선택 — 비우면 시·도 전체)</label>
+            <input type="text" id="pharmSigungu" placeholder="예) 강남구" />
+          </div>
+          <div class="field">
+            <label>최대 수집 개수</label>
+            <input type="number" id="pharmMax" min="1" max="3000" placeholder="1000" />
+            <div class="hint">한 번에 너무 많으면 느려집니다. 1000 권장(최대 3000).</div>
+          </div>
+          <button type="button" class="btn" id="collectBtn">
+            <span id="collectText">🏥 약국 자동 수집</span>
+            <span id="collectSpin" class="spinner hidden"></span>
+          </button>
+          <div id="collectMsg" class="msg hidden" style="margin-top:12px;white-space:pre-line"></div>
+        </div>
+
+        <!-- ③ 메일 발송 -->
+        <div class="card mail-narrow">
+          <h2>③ 메일 발송</h2>
+          <p class="card-desc">아래 ④ 시트에서 보낼 약국의 <b>선택(체크)</b> 칸을 켠 뒤 발송하세요. 먼저 <b>나에게 테스트 발송</b>으로 모양을 확인하시길 권합니다.</p>
+
+          <div class="field">
+            <label>테스트 받을 메일</label>
+            <input type="text" id="testEmail" placeholder="예) 내 이메일 주소" />
+          </div>
+          <button type="button" class="btn btn-line" id="testSendBtn">
+            <span id="testSendText">✉ 나에게 테스트 발송</span>
+            <span id="testSendSpin" class="spinner hidden"></span>
+          </button>
+
+          <div class="field" style="margin-top:18px">
+            <label>하루 최대 발송 통수</label>
+            <input type="number" id="dailyLimit" min="1" max="1500" placeholder="90" />
+            <div class="hint">구글 계정 하루 한도(보통 100통) 안에서, 한 번/하루에 보낼 최대 개수입니다.</div>
+          </div>
+          <label class="inline-check" style="margin-bottom:14px">
+            <input type="checkbox" id="abCheck" /> A/B 테스트로 보내기 (제목 A·B를 절반씩)
+          </label>
+          <button type="button" class="btn" id="sendBtn">
+            <span id="sendText">🚀 선택한(체크한) 약국에 지금 발송</span>
+            <span id="sendSpin" class="spinner hidden"></span>
+          </button>
+          <div id="sendMsg" class="msg hidden" style="margin-top:12px;white-space:pre-line"></div>
+
+          <hr style="border:none;border-top:1px solid #eee;margin:22px 0" />
+
+          <h2 style="font-size:15px">⏰ 예약 / 하루 분할 발송</h2>
+          <p class="card-desc">체크해둔 약국을 정한 시각에 자동 발송하거나, 매일 조금씩 나눠 보낼 수 있습니다.</p>
+          <div id="scheduleStatus" class="msg msg-info" style="margin-bottom:12px">현재 예약/자동 발송 없음</div>
+          <div class="field">
+            <label>예약 발송 — 보낼 시각</label>
+            <input type="datetime-local" id="scheduleAt" />
+          </div>
+          <button type="button" class="btn btn-line btn-sm" id="scheduleBtn">
+            <span id="scheduleText">📅 이 시각에 1회 예약</span>
+            <span id="scheduleSpin" class="spinner hidden"></span>
+          </button>
+          <button type="button" class="btn btn-line btn-sm" id="autoDailyBtn" style="margin-left:6px">
+            <span id="autoDailyText">🔁 하루 분할 자동발송 켜기</span>
+            <span id="autoDailySpin" class="spinner hidden"></span>
+          </button>
+          <button type="button" class="btn btn-line btn-sm" id="cancelScheduleBtn" style="margin-left:6px">✖ 예약·자동 모두 취소</button>
+          <div id="scheduleMsg" class="msg hidden" style="margin-top:12px;white-space:pre-line"></div>
+
+          <hr style="border:none;border-top:1px solid #eee;margin:22px 0" />
+
+          <h2 style="font-size:15px">📥 답장 확인 · 📊 A/B 결과</h2>
+          <button type="button" class="btn btn-line btn-sm" id="replyBtn">
+            <span id="replyText">📥 답장(회신) 지금 확인</span>
+            <span id="replySpin" class="spinner hidden"></span>
+          </button>
+          <button type="button" class="btn btn-line btn-sm" id="abStatsBtn" style="margin-left:6px">
+            <span id="abStatsText">📊 A/B 읽음률 보기</span>
+            <span id="abStatsSpin" class="spinner hidden"></span>
+          </button>
+          <div class="hint" style="margin-top:8px">답장은 매일 자동으로도 확인되어, 아래 시트의 '회신' 칸에 표시됩니다.</div>
+          <div id="toolsMsg" class="msg hidden" style="margin-top:12px;white-space:pre-line"></div>
+        </div>
+
+        <!-- ④ 약국DB 시트 -->
+        <div class="card" id="mailSheetBox">
+          <h2>④ 약국DB (여기서 체크하세요)</h2>
+          <p class="card-desc">보낼 약국의 'B열 선택' 체크박스를 켜고, 위 [선택한 약국에 발송]을 누르세요. 발송·읽음 결과도 여기에 표시됩니다.</p>
+          <a id="openMailSheetBtn" class="btn btn-line btn-sm" target="_blank" rel="noopener" style="margin-bottom:10px;text-decoration:none">↗ 새 창에서 시트 크게 열기</a>
+          <button type="button" id="mailFullscreenBtn" class="btn btn-line btn-sm" style="margin-bottom:10px;margin-left:6px">🔳 시트 전체화면</button>
+          <iframe id="mailSheetFrame" class="sheet-frame" title="약국DB 시트"></iframe>
+          <div class="msg msg-info" style="margin-top:12px">
+            💡 명단을 추가한 뒤에는 이 시트가 자동으로 새로고침됩니다. 혹시 안 보이면 위 [새 창에서 열기]로 확인하세요.
+          </div>
+        </div>
+
       </div>
 
       <!-- (탭2) 소개서 이미지 -->

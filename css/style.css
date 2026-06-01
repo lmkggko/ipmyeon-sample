@@ -353,6 +353,30 @@ input[readonly] { background: #f3f4f6; color: var(--text-soft); }
   overflow: auto;
 }
 #tab-data.fullscreen .sheet-frame { height: calc(100vh - 58px); }
+
+/* 입점 권유 메일 탭: 시트는 넓게, 입력 영역(.mail-narrow)은 가운데 좁게 */
+#tab-mail {
+  width: 96vw;
+  max-width: 96vw;
+  margin-left: calc(50% - 48vw);
+  margin-right: calc(50% - 48vw);
+}
+#tab-mail .mail-narrow { max-width: 860px; margin-left: auto; margin-right: auto; }
+#tab-mail .card { margin-top: 16px; }
+/* 약국DB 시트 전체화면 모드 */
+#mailSheetBox.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  border-radius: 0;
+  padding: 8px 10px;
+  overflow: auto;
+}
+#mailSheetBox.fullscreen .sheet-frame { height: calc(100vh - 120px); }
+
 .intro-admin-item {
   display: flex;
   align-items: center;
