@@ -91,6 +91,12 @@
             <textarea id="mailSenderInfo" rows="3" placeholder="예) 현대보감 / 담당자 OOO / 010-0000-0000 / 서울시 ..."></textarea>
             <div class="hint">메일 맨 아래에 표시됩니다. 광고 메일은 보내는 사람 정보를 넣는 것이 원칙이라 채워두길 권합니다.</div>
           </div>
+          <div class="field" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 14px">
+            <label class="inline-check" style="font-size:14px;font-weight:700;color:var(--text);margin-top:0">
+              <input type="checkbox" id="deliveryMode" /> 📬 도달률 우선 모드 (스팸함 회피)
+            </label>
+            <div class="hint" style="margin-top:6px">켜면 <b>추적 픽셀·링크를 빼고 단순 텍스트</b>로 보내 스팸함에 덜 빠집니다. (대신 <b>'읽음확인'은 작동 안 함</b>, 수신거부는 "회신"으로 받음) — <b>새 도메인은 켜두길 권장</b>합니다.</div>
+          </div>
           <button type="button" class="btn" id="saveMailBtn">
             <span id="saveMailText">메일 내용 저장</span>
             <span id="saveMailSpin" class="spinner hidden"></span>
@@ -129,7 +135,7 @@
         <!-- ②-2 전국 약국 자동 수집 (전화·우편용) -->
         <div class="card mail-narrow">
           <h2>②-2 · 전국 약국 자동 수집 (전화·우편용)</h2>
-          <p class="card-desc">공공데이터로 전국 약국(<b>약국명·주소·전화</b>)을 자동으로 DB에 추가합니다. ⚠️ <b>이메일은 제공되지 않아</b> 메일 발송엔 쓸 수 없고, 전화·우편·방문 영업용입니다. (처음 한 번 공공데이터 인증키 발급이 필요 — 사용설명서 참고)</p>
+          <p class="card-desc">공공데이터로 약국(<b>약국명·주소·전화</b>)을 자동으로 DB에 추가합니다. <b>'전국'을 고르면 한 번 누르는 것으로 전국 약 2.5만 곳을 끝까지 나눠 채웁니다</b>(진행률 표시). ⚠️ <b>이메일은 제공되지 않아</b> 메일 발송엔 못 쓰고 전화·우편·방문 영업용입니다. (처음 한 번 공공데이터 인증키 발급 필요 — 사용설명서 참고)</p>
           <div class="field">
             <label>공공데이터 인증키</label>
             <input type="text" id="pharmApiKey" placeholder="공공데이터포털에서 발급받은 '일반 인증키(Encoding)'" />
@@ -138,7 +144,7 @@
           <div class="field">
             <label>시 / 도</label>
             <select id="pharmSido">
-              <option value="">선택하세요</option>
+              <option value="전국">🇰🇷 전국 (모든 시·도 한 번에)</option>
               <option value="서울특별시">서울특별시</option>
               <option value="부산광역시">부산광역시</option>
               <option value="대구광역시">대구광역시</option>
@@ -159,14 +165,12 @@
             </select>
           </div>
           <div class="field">
-            <label>시 / 군 / 구 (선택 — 비우면 시·도 전체)</label>
+            <label>시 / 군 / 구 (선택 — '전국'이거나 비우면 시·도 전체)</label>
             <input type="text" id="pharmSigungu" placeholder="예) 강남구" />
           </div>
-          <div class="field">
-            <label>최대 수집 개수</label>
-            <input type="number" id="pharmMax" min="1" max="3000" placeholder="1000" />
-            <div class="hint">한 번에 너무 많으면 느려집니다. 1000 권장(최대 3000).</div>
-          </div>
+          <label class="inline-check" style="margin-bottom:12px">
+            <input type="checkbox" id="collectClear" checked /> 기존 약국DB 명단을 비우고 새로 채우기 (추천 · 중복 방지)
+          </label>
           <button type="button" class="btn" id="collectBtn">
             <span id="collectText">🏥 약국 자동 수집</span>
             <span id="collectSpin" class="spinner hidden"></span>

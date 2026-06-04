@@ -271,16 +271,24 @@ document.addEventListener("DOMContentLoaded", function () {
           document.getElementById("mailBody").value = res.body || "";
           document.getElementById("mailSenderName").value = res.senderName || "";
           document.getElementById("mailSenderInfo").value = res.senderInfo || "";
+          document.getElementById("deliveryMode").checked = (res.deliveryMode === true);
           document.getElementById("dailyLimit").value = res.dailyLimit || 90;
           document.getElementById("pharmApiKey").value = res.pharmApiKey || "";
           renderScheduleStatus(res.schedule);
 
-          var base = "https://docs.google.com/spreadsheets/d/" + CONFIG.SHEET_ID;
+          // ★ 백엔드가 실제로 데이터를 쓰는 시트(ssId)로 화면을 맞춘다 (config.SHEET_ID와 달라도 자동 보정)
+          var sid = res.ssId || CONFIG.SHEET_ID;
+          var base = "https://docs.google.com/spreadsheets/d/" + sid;
           var gidPart = res.dbGid ? ("&gid=" + res.dbGid + "#gid=" + res.dbGid) : "";
           document.getElementById("mailSheetFrame").src =
             base + "/edit?rm=embedded&widget=true&headers=false" + gidPart;
           document.getElementById("openMailSheetBtn").href =
             base + "/edit" + (res.dbGid ? "#gid=" + res.dbGid : "");
+          // 신청 데이터 탭 시트도 같은(백엔드) 시트로 맞춘다
+          var sf = document.getElementById("sheetFrame");
+          if (sf) sf.src = base + "/edit?rm=embedded&widget=true&headers=false";
+          var osb = document.getElementById("openSheetBtn");
+          if (osb) osb.href = base + "/edit";
         }
       })
       .catch(function () {});
@@ -324,9 +332,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!subject || !body.trim()) { showInline(msg, "msg-error", "메일 제목(A안)과 본문을 입력해주세요."); return; }
 
     var dailyLimit = parseInt(document.getElementById("dailyLimit").value, 10) || 90;
+    var deliveryMode = document.getElementById("deliveryMode").checked;
     toggleSpin("saveMail", true);
     // 본문이 길 수 있어 POST 방식으로 전송
-    Api.post("saveMailSettings", { id: auth.id, pw: auth.pw, subject: subject, subjectB: subjectB, body: body, senderName: senderName, senderInfo: senderInfo, dailyLimit: dailyLimit })
+    Api.post("saveMailSettings", { id: auth.id, pw: auth.pw, subject: subject, subjectB: subjectB, body: body, senderName: senderName, senderInfo: senderInfo, deliveryMode: deliveryMode, dailyLimit: dailyLimit })
       .then(function (res) {
         toggleSpin("saveMail", false);
         if (res && res.ok) showInline(msg, "msg-success", "저장되었습니다. ✅");
@@ -442,32 +451,54 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(function (err) { toggleSpin("send", false); showInline(msg, "msg-error", err.message || "발송 중 오류"); });
   });
 
-  /* ---------------- ②-2 전국 약국 자동 수집 ---------------- */
+  /* ---------------- ②-2 전국/시도 약국 자동 수집 (페이지 나눠받기 + 진행률) ---------------- */
   document.getElementById("collectBtn").addEventListener("click", function () {
     var msg = document.getElementById("collectMsg");
     msg.classList.add("hidden");
     var apiKey = document.getElementById("pharmApiKey").value.trim();
-    var sido = document.getElementById("pharmSido").value;
+    var sido = document.getElementById("pharmSido").value;          // '전국' 또는 시도명
     var sigungu = document.getElementById("pharmSigungu").value.trim();
-    var maxRows = parseInt(document.getElementById("pharmMax").value, 10) || 1000;
+    var clearFirst = document.getElementById("collectClear").checked;
     if (!apiKey) { showInline(msg, "msg-error", "공공데이터 인증키를 먼저 입력해주세요. (사용설명서 참고)"); return; }
-    if (!sido) { showInline(msg, "msg-error", "시/도를 선택해주세요."); return; }
+
+    var nationwide = (!sido || sido === "전국");
+    var label = nationwide ? "전국" : (sido + (sigungu ? " " + sigungu : ""));
+    if (clearFirst && !confirm("기존 약국DB 명단을 모두 지우고 '" + label + "' 약국으로 새로 채웁니다.\n진행할까요?")) return;
 
     toggleSpin("collect", true);
-    Api.post("collectPharmacies", { id: auth.id, pw: auth.pw, apiKey: apiKey, sido: sido, sigungu: sigungu, maxRows: maxRows })
-      .then(function (res) {
-        toggleSpin("collect", false);
-        if (res && res.ok) {
-          var t = sido + (sigungu ? " " + sigungu : "") + " 약국 " + res.added + "곳을 추가했습니다. (현재 명단 " + res.total + "곳) ✅";
-          if (res.regionTotal) t += "\n해당 지역 전체 약국 수: 약 " + res.regionTotal + "곳";
-          t += "\n※ 이메일은 없으니 전화·우편 영업용으로 활용하세요.";
-          showInline(msg, "msg-success", t);
-          refreshMailSheet();
-        } else {
-          showInline(msg, "msg-error", (res && res.error) ? res.error : "수집에 실패했습니다.");
-        }
+    showInline(msg, "msg-info", label + " 약국 수집 시작...");
+    var totalAdded = 0;
+
+    // 한 번 호출에 5,000곳씩 받고, 다 못 받으면 다음 페이지로 이어서 호출(끝까지)
+    function step(page, doClear) {
+      Api.post("collectPharmacies", {
+        id: auth.id, pw: auth.pw, apiKey: apiKey,
+        sido: sido, sigungu: sigungu, startPage: page, clearFirst: doClear
       })
-      .catch(function (err) { toggleSpin("collect", false); showInline(msg, "msg-error", err.message || "수집 중 오류"); });
+        .then(function (res) {
+          if (!res || !res.ok) {
+            toggleSpin("collect", false);
+            showInline(msg, "msg-error", (res && res.error) ? res.error : "수집에 실패했습니다.");
+            refreshMailSheet();
+            return;
+          }
+          totalAdded += (res.added || 0);
+          var rt = res.regionTotal || 0;
+          if (res.done || !res.nextPage) {
+            toggleSpin("collect", false);
+            showInline(msg, "msg-success",
+              label + " 약국 수집 완료 — 총 " + totalAdded + "곳 추가" + (rt ? " (전체 약 " + rt + "곳)" : "") +
+              " ✅\n현재 명단 " + res.total + "곳. ※ 이메일은 없으니 전화·우편 영업용으로 활용하세요.");
+            refreshMailSheet();
+          } else {
+            showInline(msg, "msg-info",
+              label + " 수집 중... " + totalAdded + (rt ? " / 약 " + rt : "") + "곳 받음 (계속 진행 중, 닫지 마세요)");
+            step(res.nextPage, false);   // 비우기는 첫 호출에서만, 이후엔 이어붙이기
+          }
+        })
+        .catch(function (err) { toggleSpin("collect", false); showInline(msg, "msg-error", err.message || "수집 중 오류"); });
+    }
+    step(1, clearFirst);
   });
 
   /* ---------------- ③ 예약 발송 ---------------- */
